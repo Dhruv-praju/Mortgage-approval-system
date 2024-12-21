@@ -1,0 +1,1 @@
+{"class":"org.apache.spark.ml.feature.FeatureHasher","timestamp":1733675354920,"sparkVersion":"3.5.2","uid":"FeatureHasher_06d7b32e66d7","paramMap":{"outputCol":"county_code_hashed","inputCols":["county_code"],"numFeatures":1000},"defaultParamMap":{"outputCol":"FeatureHasher_06d7b32e66d7__output","numFeatures":262144}}

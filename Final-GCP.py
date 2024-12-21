@@ -154,7 +154,7 @@ numAssembler = VectorAssembler(inputCols=continuous_numerical_features,
 numScaler = StandardScaler(inputCol="con_num_features", outputCol="con_num_features_scaled")
 
 # assemble all the features together
-featureAssembler = VectorAssembler(inputCols=["con_num_features_scaled", "county_code_hashed"]+cat_indexed_features, outputCol='features')
+featureAssembler = VectorAssembler(inputCols=["con_num_features_scaled", "county_code_hashed"]+discrete_numerical_features+cat_indexed_features, outputCol='features')
 
 # make the Pipeline
 transformPipeline = Pipeline(stages = [labelEncoder, hasher, numAssembler, numScaler, featureAssembler])
@@ -164,65 +164,73 @@ transformPipeModel = transformPipeline.fit(train_df)
 
 train_df = transformPipeModel.transform(train_df)
 
-print("...............Feature Engineering Successfull.................")
+# Save the pipeline model
+modelOutputPath = os.path.join(outputDir, 'models/transformPipelineModel')
+transformPipeModel.write().save(modelOutputPath)
 
-## 6. MODEL PREDICTION
-def evaluate_model(predictions, label_col='action_taken', prediction_col='prediction', raw_prediction_col='rawPrediction'):
-    '''It returns classification evaluation metrics like accuracy, precision, f1, recall and roc'''
+print("...............Feature Engineering Successful.................")
+
+# ## 6. MODEL PREDICTION
+# def evaluate_model(predictions, label_col='action_taken', prediction_col='prediction', raw_prediction_col='rawPrediction'):
+#     '''It returns classification evaluation metrics like accuracy, precision, f1, recall and roc'''
     
-    # Initialize evaluators
-    evaluator_accuracy = MulticlassClassificationEvaluator(labelCol=label_col, predictionCol=prediction_col, metricName='accuracy')
-    evaluator_precision = MulticlassClassificationEvaluator(labelCol=label_col, predictionCol=prediction_col, metricName='weightedPrecision')
-    evaluator_recall = MulticlassClassificationEvaluator(labelCol=label_col, predictionCol=prediction_col, metricName='weightedRecall')
-    evaluator_f1 = MulticlassClassificationEvaluator(labelCol=label_col, predictionCol=prediction_col, metricName='f1')
-    evaluator_roc = BinaryClassificationEvaluator(labelCol=label_col, rawPredictionCol=raw_prediction_col, metricName='areaUnderROC')
+#     # Initialize evaluators
+#     evaluator_accuracy = MulticlassClassificationEvaluator(labelCol=label_col, predictionCol=prediction_col, metricName='accuracy')
+#     evaluator_precision = MulticlassClassificationEvaluator(labelCol=label_col, predictionCol=prediction_col, metricName='weightedPrecision')
+#     evaluator_recall = MulticlassClassificationEvaluator(labelCol=label_col, predictionCol=prediction_col, metricName='weightedRecall')
+#     evaluator_f1 = MulticlassClassificationEvaluator(labelCol=label_col, predictionCol=prediction_col, metricName='f1')
+#     evaluator_roc = BinaryClassificationEvaluator(labelCol=label_col, rawPredictionCol=raw_prediction_col, metricName='areaUnderROC')
 
-    # Calculate metrics
-    accuracy = evaluator_accuracy.evaluate(predictions)
-    precision = evaluator_precision.evaluate(predictions)
-    recall = evaluator_recall.evaluate(predictions)
-    f1_score = evaluator_f1.evaluate(predictions)
-    roc_auc = evaluator_roc.evaluate(predictions)
+#     # Calculate metrics
+#     accuracy = evaluator_accuracy.evaluate(predictions)
+#     precision = evaluator_precision.evaluate(predictions)
+#     recall = evaluator_recall.evaluate(predictions)
+#     f1_score = evaluator_f1.evaluate(predictions)
+#     roc_auc = evaluator_roc.evaluate(predictions)
 
-    # Return all metrics as a dictionary
-    metrics = {
-        'accuracy': accuracy,
-        'precision': precision,
-        'recall': recall,
-        'f1_score': f1_score,
-        'roc_auc': roc_auc
-    }
+#     # Return all metrics as a dictionary
+#     metrics = {
+#         'accuracy': accuracy,
+#         'precision': precision,
+#         'recall': recall,
+#         'f1_score': f1_score,
+#         'roc_auc': roc_auc
+#     }
 
-    return metrics
+#     return metrics
 
-models = {
-    'Logistic Regression': LogisticRegression(featuresCol='features', labelCol='action_taken'),
-    'Support Vector Machine': LinearSVC(featuresCol='features', labelCol='action_taken'),
-    # 'Naive Bayes': NaiveBayes(featuresCol='features', labelCol='action_taken'),
-    'Factorization Machine': FMClassifier(featuresCol='features', labelCol='action_taken'),
-    'Decision Tree': DecisionTreeClassifier(featuresCol='features', labelCol='action_taken', maxBins=4000),
-    'Random Forest': RandomForestClassifier(featuresCol='features', labelCol='action_taken', maxBins=4000),
-    'Gradient Boosting Trees': GBTClassifier(featuresCol='features', labelCol='action_taken', maxBins=4000),
-}
+# models = {
+#     'Logistic Regression': LogisticRegression(featuresCol='features', labelCol='action_taken'),
+#     'Support Vector Machine': LinearSVC(featuresCol='features', labelCol='action_taken'),
+#     # 'Naive Bayes': NaiveBayes(featuresCol='features', labelCol='action_taken'),
+#     'Factorization Machine': FMClassifier(featuresCol='features', labelCol='action_taken'),
+#     'Decision Tree': DecisionTreeClassifier(featuresCol='features', labelCol='action_taken', maxBins=4000),
+#     'Random Forest': RandomForestClassifier(featuresCol='features', labelCol='action_taken', maxBins=4000),
+#     'Gradient Boosting Trees': GBTClassifier(featuresCol='features', labelCol='action_taken', maxBins=4000),
+# }
 
-for algo in models:
-    print(f"========== {algo} ============")
+# for algo in models:
+#     print(f"========== {algo} ============")
 
-    # Train the model
-    model = models[algo]
-    trained_model = model.fit(train_df)
+#     # Train the model
+#     model = models[algo]
+#     trained_model = model.fit(train_df)
 
-    # Evaluate on Test data
-    test_df_transformed = transformPipeModel.transform(test_df)
-    test_predictions = trained_model.transform(test_df_transformed)
+#     # Evaluate on Test data
+#     test_df_transformed = transformPipeModel.transform(test_df)
+#     test_predictions = trained_model.transform(test_df_transformed)
 
-    results = evaluate_model(test_predictions)
-    print("accuracy: {:.4f}".format(results['accuracy']))
-    print("precison: {:.4f}".format(results['precision']))
-    print("recall: {:.4f}".format(results['recall']))
-    print("f1-score: {:.4f}".format(results['f1_score']))
-    print("ROC: {:.4f}".format(results['roc_auc']))
+#     results = evaluate_model(test_predictions)
+#     print("accuracy: {:.4f}".format(results['accuracy']))
+#     print("precison: {:.4f}".format(results['precision']))
+#     print("recall: {:.4f}".format(results['recall']))
+#     print("f1-score: {:.4f}".format(results['f1_score']))
+#     print("ROC: {:.4f}".format(results['roc_auc']))
 
-    print('\n')
+#     print('\n')
 
-print(".............. DONE Sucessfully!!! ..........................")
+#     # Save the model
+#     modelOutputPath = os.path.join(outputDir, f'models/{algo}')
+#     trained_model.write().overwrite().save(modelOutputPath)
+
+# print(".............. DONE Sucessfully!!! ..........................")
