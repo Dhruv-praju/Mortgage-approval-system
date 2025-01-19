@@ -1,7 +1,7 @@
 from pyspark.sql import SparkSession
 from pyspark.sql.types import StructType, StructField, IntegerType, StringType, DoubleType, FloatType
 from pyspark.sql.functions import col, when, count, isnan
-from pyspark.ml.feature import StringIndexer, StandardScaler, VectorAssembler, FeatureHasher
+from pyspark.ml.feature import StringIndexer, StandardScaler, VectorAssembler, FeatureHasher, OneHotEncoder
 from pyspark.ml import Pipeline
 from pyspark.ml.classification import LogisticRegression, LinearSVC, NaiveBayes, DecisionTreeClassifier, RandomForestClassifier, GBTClassifier, FMClassifier
 from pyspark.ml.evaluation import MulticlassClassificationEvaluator, BinaryClassificationEvaluator
@@ -131,33 +131,35 @@ print("............Data splited to train-test Sucessfully................")
 
 ## 5. FEATURE ENGINEERING
 
-# define categorical and numerical features
-categorical_features = [field.name for field in train_df.schema.fields if field.dataType is StringType()]
-numerical_features = [field for field in train_df.columns if field not in categorical_features]
 
-continuous_numerical_features = ["loan_amount", "interest_rate", "loan_term", "income", "property_value"]
-discrete_numerical_features = [item for item in numerical_features if item not in continuous_numerical_features]
-categorical_features.remove('county_code')
-cat_indexed_features = [f"{cat}_indexed" for cat in categorical_features]
+# Categorical columns 
+# cat_1 columns (<10 ) ==> one hot encoding
+cat_1_cols = ['loan_type', 'loan_purpose', 'applicant_sex', 'total_units', 'occupancy_type', 'applicant_age', 'co_applicant_age', 'applicant_credit_score_type', 'co_applicant_credit_score_type']
+# cat_2 columns (high unique categories) ==> label encoding
+cat_2_cols = ['state_code', 'county_code', 'derived_msa_md', 'lei']
 
-# perform Label encoding on categorical features
-labelEncoder = StringIndexer(inputCols=categorical_features, 
-                           outputCols=cat_indexed_features, handleInvalid="skip")
+# Numerical columns ==> Standard Scaler
+num_features = ['loan_amount', 'interest_rate', 'loan_term', 'income', 'property_value']
 
-# perform feature hashing on 'county_code' as a lot of distinct values
-hasher = FeatureHasher(inputCols=["county_code"], outputCol="county_code_hashed", numFeatures=1000)
+# Perform transformations
+cat_1_index_cols = [ c+"_index" for c in cat_1_cols]
+cat_1_OHE_cols = [c+"_OHE" for c in cat_1_cols]
 
-# perform Standard scaling on continuous numerical features
-numAssembler = VectorAssembler(inputCols=continuous_numerical_features, 
-                            outputCol="con_num_features")
+cat_1_stringIndexer = StringIndexer(inputCols=cat_1_cols, outputCols=cat_1_index_cols, handleInvalid="skip")
+cat_1_OneHotEncoder = OneHotEncoder(inputCols=cat_1_index_cols, outputCols=cat_1_OHE_cols)
 
-numScaler = StandardScaler(inputCol="con_num_features", outputCol="con_num_features_scaled")
+cat_2_index_cols = [ c+"_index" for c in cat_2_cols]
+
+cat_2_stringIndexer = StringIndexer(inputCols=cat_2_cols, outputCols=cat_2_index_cols, handleInvalid="skip")
+
+num_assembler = VectorAssembler(inputCols=num_features, outputCol="num_vector")
+num_scaler = StandardScaler(inputCol='num_vector', outputCol='num_scaled_vector')
 
 # assemble all the features together
-featureAssembler = VectorAssembler(inputCols=["con_num_features_scaled", "county_code_hashed"]+discrete_numerical_features+cat_indexed_features, outputCol='features')
+X_assembler = VectorAssembler(inputCols=['num_scaled_vector'] + cat_1_OHE_cols + cat_2_index_cols, outputCol='features' )
 
 # make the Pipeline
-transformPipeline = Pipeline(stages = [labelEncoder, hasher, numAssembler, numScaler, featureAssembler])
+transformPipeline = Pipeline(stages = [cat_1_stringIndexer,cat_1_OneHotEncoder, cat_2_stringIndexer, num_assembler, num_scaler, X_assembler])
 
 # train it
 transformPipeModel = transformPipeline.fit(train_df)
@@ -166,7 +168,7 @@ train_df = transformPipeModel.transform(train_df)
 
 # Save the pipeline model
 modelOutputPath = os.path.join(outputDir, 'models/transformPipelineModel')
-transformPipeModel.write().save(modelOutputPath)
+transformPipeModel.write().overwrite().save(modelOutputPath)
 
 print("...............Feature Engineering Successful.................")
 
@@ -199,38 +201,82 @@ def evaluate_model(predictions, label_col='action_taken', prediction_col='predic
 
     return metrics
 
-models = {
-    'Logistic Regression': LogisticRegression(featuresCol='features', labelCol='action_taken'),
-    'Support Vector Machine': LinearSVC(featuresCol='features', labelCol='action_taken'),
-    # 'Naive Bayes': NaiveBayes(featuresCol='features', labelCol='action_taken'),
-    'Factorization Machine': FMClassifier(featuresCol='features', labelCol='action_taken'),
-    'Decision Tree': DecisionTreeClassifier(featuresCol='features', labelCol='action_taken', maxBins=4000),
-    'Random Forest': RandomForestClassifier(featuresCol='features', labelCol='action_taken', maxBins=4000),
-    'Gradient Boosting Trees': GBTClassifier(featuresCol='features', labelCol='action_taken', maxBins=4000),
-}
+# models = {
+#     'Logistic Regression': LogisticRegression(featuresCol='features', labelCol='action_taken'),
+#     'Support Vector Machine': LinearSVC(featuresCol='features', labelCol='action_taken'),
+#     # 'Naive Bayes': NaiveBayes(featuresCol='features', labelCol='action_taken'),
+#     'Factorization Machine': FMClassifier(featuresCol='features', labelCol='action_taken'),
+#     'Decision Tree': DecisionTreeClassifier(featuresCol='features', labelCol='action_taken', maxBins=4000),
+#     'Random Forest': RandomForestClassifier(featuresCol='features', labelCol='action_taken', maxBins=4000),
+#     'Gradient Boosting Trees': GBTClassifier(featuresCol='features', labelCol='action_taken', maxBins=4000),
+# }
 
-for algo in models:
-    print(f"========== {algo} ============")
+# for algo in models:
+#     print(f"========== {algo} ============")
 
-    # Train the model
-    model = models[algo]
-    trained_model = model.fit(train_df)
+#     # Train the model
+#     model = models[algo]
+#     trained_model = model.fit(train_df)
 
-    # Evaluate on Test data
-    test_df_transformed = transformPipeModel.transform(test_df)
-    test_predictions = trained_model.transform(test_df_transformed)
+#     # Evaluate on Test data
+#     test_df_transformed = transformPipeModel.transform(test_df)
+#     test_predictions = trained_model.transform(test_df_transformed)
 
-    results = evaluate_model(test_predictions)
-    print("accuracy: {:.4f}".format(results['accuracy']))
-    print("precison: {:.4f}".format(results['precision']))
-    print("recall: {:.4f}".format(results['recall']))
-    print("f1-score: {:.4f}".format(results['f1_score']))
-    print("ROC: {:.4f}".format(results['roc_auc']))
+#     results = evaluate_model(test_predictions)
+#     print("accuracy: {:.4f}".format(results['accuracy']))
+#     print("precison: {:.4f}".format(results['precision']))
+#     print("recall: {:.4f}".format(results['recall']))
+#     print("f1-score: {:.4f}".format(results['f1_score']))
+#     print("ROC: {:.4f}".format(results['roc_auc']))
 
-    print('\n')
+#     print('\n')
 
-    # Save the model
-    modelOutputPath = os.path.join(outputDir, f'models/{algo}')
-    trained_model.write().overwrite().save(modelOutputPath)
+#     # Save the model
+#     modelOutputPath = os.path.join(outputDir, f'models/{algo}')
+#     trained_model.write().overwrite().save(modelOutputPath)
 
-print(".............. DONE Sucessfully!!! ..........................")
+# print(".............. Trained all Models Sucessfully! ..........................")
+
+## 7. HYPER-PARAMETER TUNNING
+from pyspark.ml.tuning import ParamGridBuilder, TrainValidationSplit
+
+# tune the parameters of (GBT model)
+gbt = GBTClassifier(featuresCol='features', labelCol='action_taken')
+
+# define parameter grid
+paramGrid = ParamGridBuilder()\
+        .addGrid(gbt.maxDepth, [3,5,7])\
+        .addGrid(gbt.maxBins, [4000, 5000, 7000])\
+        .addGrid(gbt.stepSize, [0.05, 0.1, 0.2])\
+        .build()
+
+evaluator_accuracy = MulticlassClassificationEvaluator(labelCol='action_taken', predictionCol='prediction', metricName='accuracy')
+
+# divide train-validation split from train data
+train_validator_model = TrainValidationSplit(estimator=gbt,
+                                            estimatorParamMaps=paramGrid,
+                                            evaluator=evaluator_accuracy,
+                                            trainRatio=0.8)
+
+# train the model
+trained_tv_model = train_validator_model.fit(train_df)
+best_gbt_model = trained_tv_model.bestModel
+
+# evaluate on Test data
+test_df_transformed = transformPipeModel.transform(test_df)
+test_predictions = best_gbt_model.transform(test_df_transformed)
+
+results = evaluate_model(test_predictions)
+print("accuracy: {:.4f}".format(results['accuracy']))
+print("precison: {:.4f}".format(results['precision']))
+print("recall: {:.4f}".format(results['recall']))
+print("f1-score: {:.4f}".format(results['f1_score']))
+print("ROC: {:.4f}".format(results['roc_auc']))
+
+print('\n')
+
+# Save the model
+modelOutputPath = os.path.join(outputDir, f'Tunned_models/GBT')
+best_gbt_model.write().overwrite().save(modelOutputPath)
+
+print('.............. Done Hyperparameter tuning Sucessfully!!! ..........................')
