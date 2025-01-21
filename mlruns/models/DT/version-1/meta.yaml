@@ -1,0 +1,14 @@
+aliases: []
+creation_timestamp: 1737351391475
+current_stage: None
+description: ''
+last_updated_timestamp: 1737351391475
+name: DT
+run_id: cb7e377a88c8468eb0e0ec0d3deb2026
+run_link: ''
+source: mlflow-artifacts:/134215803134404427/cb7e377a88c8468eb0e0ec0d3deb2026/artifacts/model
+status: READY
+status_message: null
+storage_location: mlflow-artifacts:/134215803134404427/cb7e377a88c8468eb0e0ec0d3deb2026/artifacts/model
+user_id: null
+version: 1

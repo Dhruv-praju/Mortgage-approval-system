@@ -1,0 +1,14 @@
+aliases: []
+creation_timestamp: 1737427827304
+current_stage: None
+description: ''
+last_updated_timestamp: 1737427827304
+name: Decision Treee
+run_id: 1a4cadf15475407a8ff9158372cd11c4
+run_link: ''
+source: mlflow-artifacts:/483641020343194650/1a4cadf15475407a8ff9158372cd11c4/artifacts/model
+status: READY
+status_message: null
+storage_location: mlflow-artifacts:/483641020343194650/1a4cadf15475407a8ff9158372cd11c4/artifacts/model
+user_id: null
+version: 1

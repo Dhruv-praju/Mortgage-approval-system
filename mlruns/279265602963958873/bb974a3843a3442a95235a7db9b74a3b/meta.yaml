@@ -1,0 +1,15 @@
+artifact_uri: mlflow-artifacts:/279265602963958873/bb974a3843a3442a95235a7db9b74a3b/artifacts
+end_time: null
+entry_point_name: ''
+experiment_id: '279265602963958873'
+lifecycle_stage: active
+run_id: bb974a3843a3442a95235a7db9b74a3b
+run_name: capricious-sow-192
+run_uuid: bb974a3843a3442a95235a7db9b74a3b
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1737431215580
+status: 1
+tags: []
+user_id: dhruvprajapati

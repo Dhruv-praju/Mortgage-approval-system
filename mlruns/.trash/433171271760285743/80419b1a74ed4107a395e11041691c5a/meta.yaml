@@ -1,0 +1,16 @@
+artifact_uri: mlflow-artifacts:/433171271760285743/80419b1a74ed4107a395e11041691c5a/artifacts
+deleted_time: 1737403289570
+end_time: 1737401979905
+entry_point_name: ''
+experiment_id: '433171271760285743'
+lifecycle_stage: deleted
+run_id: 80419b1a74ed4107a395e11041691c5a
+run_name: Support Vector Machine
+run_uuid: 80419b1a74ed4107a395e11041691c5a
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1737401963360
+status: 3
+tags: []
+user_id: dhruvprajapati

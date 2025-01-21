@@ -1,0 +1,15 @@
+artifact_uri: mlflow-artifacts:/377674707853028999/33efbbb418cb4094b1ce21410da5bb92/artifacts
+end_time: 1737431963429
+entry_point_name: ''
+experiment_id: '377674707853028999'
+lifecycle_stage: active
+run_id: 33efbbb418cb4094b1ce21410da5bb92
+run_name: funny-fawn-936
+run_uuid: 33efbbb418cb4094b1ce21410da5bb92
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1737431925474
+status: 3
+tags: []
+user_id: dhruvprajapati

@@ -1,0 +1,15 @@
+artifact_uri: mlflow-artifacts:/377674707853028999/8ffceefb0a4d48c7bae4acb634e10096/artifacts
+end_time: 1737432020443
+entry_point_name: ''
+experiment_id: '377674707853028999'
+lifecycle_stage: active
+run_id: 8ffceefb0a4d48c7bae4acb634e10096
+run_name: Decision Tree
+run_uuid: 8ffceefb0a4d48c7bae4acb634e10096
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1737432011760
+status: 3
+tags: []
+user_id: dhruvprajapati

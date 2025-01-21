@@ -1,0 +1,16 @@
+artifact_uri: mlflow-artifacts:/0/db5dd5b657e748718627b2a5bb573a3c/artifacts
+deleted_time: 1737403299380
+end_time: 1737332744081
+entry_point_name: ''
+experiment_id: '0'
+lifecycle_stage: deleted
+run_id: db5dd5b657e748718627b2a5bb573a3c
+run_name: Random Forest
+run_uuid: db5dd5b657e748718627b2a5bb573a3c
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1737332733838
+status: 3
+tags: []
+user_id: dhruvprajapati

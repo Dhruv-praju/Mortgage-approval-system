@@ -1,0 +1,16 @@
+artifact_uri: mlflow-artifacts:/418269873314687346/3fd757c37ded48e684439d1fc4043a12/artifacts
+deleted_time: 1737403282286
+end_time: 1737402927907
+entry_point_name: ''
+experiment_id: '418269873314687346'
+lifecycle_stage: deleted
+run_id: 3fd757c37ded48e684439d1fc4043a12
+run_name: Random Forest
+run_uuid: 3fd757c37ded48e684439d1fc4043a12
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1737402917592
+status: 3
+tags: []
+user_id: dhruvprajapati

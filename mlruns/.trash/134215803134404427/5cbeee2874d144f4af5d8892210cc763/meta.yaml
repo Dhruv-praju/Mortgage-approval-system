@@ -1,0 +1,16 @@
+artifact_uri: mlflow-artifacts:/134215803134404427/5cbeee2874d144f4af5d8892210cc763/artifacts
+deleted_time: 1737403291736
+end_time: 1737399158595
+entry_point_name: ''
+experiment_id: '134215803134404427'
+lifecycle_stage: deleted
+run_id: 5cbeee2874d144f4af5d8892210cc763
+run_name: Gradient Boosting Trees
+run_uuid: 5cbeee2874d144f4af5d8892210cc763
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1737399142910
+status: 3
+tags: []
+user_id: dhruvprajapati

@@ -1,0 +1,16 @@
+artifact_uri: mlflow-artifacts:/0/ddac9317de444beca3a05562e27b36b9/artifacts
+deleted_time: 1737403299380
+end_time: 1737332725075
+entry_point_name: ''
+experiment_id: '0'
+lifecycle_stage: deleted
+run_id: ddac9317de444beca3a05562e27b36b9
+run_name: Factorization Machine
+run_uuid: ddac9317de444beca3a05562e27b36b9
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1737332712189
+status: 3
+tags: []
+user_id: dhruvprajapati

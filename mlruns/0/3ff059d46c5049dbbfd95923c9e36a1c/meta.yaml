@@ -1,0 +1,15 @@
+artifact_uri: mlflow-artifacts:/0/3ff059d46c5049dbbfd95923c9e36a1c/artifacts
+end_time: 1737431636763
+entry_point_name: ''
+experiment_id: '0'
+lifecycle_stage: active
+run_id: 3ff059d46c5049dbbfd95923c9e36a1c
+run_name: adaptable-bee-966
+run_uuid: 3ff059d46c5049dbbfd95923c9e36a1c
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1737431546463
+status: 3
+tags: []
+user_id: dhruvprajapati

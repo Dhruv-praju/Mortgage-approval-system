@@ -1,0 +1,1 @@
+{"class":"org.apache.spark.ml.feature.VectorAssembler","timestamp":1737431935326,"sparkVersion":"3.5.2","uid":"VectorAssembler_8da0bf7c9ed8","paramMap":{"inputCols":["loan_amount","interest_rate","loan_term","income","property_value"],"outputCol":"num_vector"},"defaultParamMap":{"handleInvalid":"error","outputCol":"VectorAssembler_8da0bf7c9ed8__output"}}
